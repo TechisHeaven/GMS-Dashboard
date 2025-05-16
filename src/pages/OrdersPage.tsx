@@ -47,8 +47,6 @@ const Orders = () => {
     queryFn: OrderService.fetchDashboardOrders,
   });
 
-  console.log(orders);
-
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="py-6">

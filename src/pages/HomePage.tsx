@@ -20,6 +20,8 @@ import api from "../utils/api.utils";
 import { Link } from "react-router-dom";
 import { OrderService } from "../service/order.service";
 import { getStatusColor, getStatusIcon } from "../utils/color.utils";
+import { useAuth } from "../provider/auth.provider";
+import { CustomerService } from "../service/custom.service";
 
 const data = [
   { name: "Jan", revenue: 20000 },
@@ -31,8 +33,13 @@ const data = [
 ];
 
 const Dashboard = () => {
+  const { token } = useAuth();
   const fetchDashboardProducts = async () => {
-    const { data } = await api.get("/api/products");
+    const { data } = await api.get("/api/products/dashboard/all", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return data;
   };
 
@@ -48,6 +55,11 @@ const Dashboard = () => {
     queryKey: ["fetchDashboardOrders"],
     queryFn: OrderService.fetchDashboardOrders,
   });
+  const { data: customers, isLoading: isCustomersLoading } = useQuery({
+    queryKey: ["fetchDashboardCustomers"],
+    queryFn: CustomerService.fetchDashboardCustomers,
+    select: (data) => data?.customers,
+  });
 
   if (isError) {
     return <div>Error loading data</div>;
@@ -55,6 +67,15 @@ const Dashboard = () => {
 
   const totalProducts = products?.length || 0;
   const totalOrders = orders?.length || 0;
+  const totalCustomers = customers?.length || 0;
+  const totalRevenue =
+    (orders?.length > 0 &&
+      orders?.reduce(
+        (sum: number, order: { totalAmount: string }) =>
+          sum + parseFloat(order.totalAmount),
+        0
+      )) ||
+    0;
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="py-6">
@@ -130,7 +151,7 @@ const Dashboard = () => {
                       </dt>
                       <dd className="flex items-baseline">
                         <div className="text-2xl font-semibold text-gray-900">
-                          2
+                          {totalCustomers}
                         </div>
                         <div className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
                           <ArrowUp className="h-4 w-4" />
@@ -157,7 +178,7 @@ const Dashboard = () => {
                       </dt>
                       <dd className="flex items-baseline">
                         <div className="text-2xl font-semibold text-gray-900">
-                          ₹100.00
+                          ₹{totalRevenue}
                         </div>
                         <div className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
                           <ArrowUp className="h-4 w-4" />
@@ -214,7 +235,7 @@ const Dashboard = () => {
               <div className="divide-y divide-gray-200">
                 {isOrdersLoading ? (
                   <div>Loading orders</div>
-                ) : (
+                ) : orders?.length > 0 ? (
                   orders?.map(
                     (
                       order: {
@@ -253,6 +274,8 @@ const Dashboard = () => {
                       </Link>
                     )
                   )
+                ) : (
+                  <div>No Orders Exists</div>
                 )}
               </div>
             </div>

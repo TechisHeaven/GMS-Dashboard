@@ -4,7 +4,7 @@ import Cookies from "js-cookie";
 export const StoreService = {
   saveStore: async (storeData: Store): Promise<{ token: string }> => {
     try {
-      const token = Cookies.get("token");
+      const token = Cookies.get("store-token");
       const { data } = await api.post(
         "/api/stores",
         {

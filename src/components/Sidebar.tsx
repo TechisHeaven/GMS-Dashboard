@@ -11,9 +11,11 @@ import {
   ReceiptText,
 } from "lucide-react";
 import Dropdown from "../components/Dropdown";
+import { useAuth } from "../provider/auth.provider";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -40,7 +42,7 @@ const Sidebar = () => {
           className={`flex items-center ${isCollapsed ? "justify-center" : ""}`}
         >
           <Store className="h-8 w-8 text-main-bg" />
-          {!isCollapsed && <Dropdown />}
+          {/* {!isCollapsed && <Dropdown />} */}
         </div>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}

@@ -105,7 +105,8 @@ const ProductDetailsPage = () => {
       navigate("/products");
     } catch (error) {
       console.error("Error saving product:", error);
-      alert("Failed to save product. Please try again.");
+      toast.error("Failed to save product. Please try again.");
+      alert("");
     }
   };
 

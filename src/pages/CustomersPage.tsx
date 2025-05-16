@@ -7,44 +7,8 @@ const CustomersPage = () => {
   const { data: users, isLoading: isCustomersLoading } = useQuery({
     queryKey: ["fetchDashboardOrders"],
     queryFn: CustomerService.fetchDashboardCustomers,
+    select: (data) => data?.customers,
   });
-
-  console.log(users);
-
-  const orders = [
-    {
-      id: "CUST-001",
-      name: "John Doe",
-      email: "johndoe@doe.com",
-      date: "2024-03-20",
-      country: "IND",
-      totalRevenue: 12.92,
-    },
-    {
-      id: "ORD-002",
-      name: "Jane Smith",
-      email: "jane@smith.com",
-      date: "2024-03-19",
-      country: "IND",
-      totalRevenue: 12.92,
-    },
-    {
-      id: "ORD-003",
-      name: "Mike Johnson",
-      email: "mike@johnson.com",
-      date: "2024-03-19",
-      country: "IND",
-      totalRevenue: 12.92,
-    },
-    {
-      id: "ORD-004",
-      name: "Sarah Williams",
-      email: "sarah@williams.com",
-      date: "2024-03-18",
-      country: "IND",
-      totalRevenue: 12.92,
-    },
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -155,51 +119,55 @@ const CustomersPage = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {orders.map((order) => (
-                    <tr key={order.id}>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.id}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {order.name}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {order.email}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500 inline-flex gap-2">
-                          <img
-                            width={20}
-                            height={20}
-                            src="https://imgs.search.brave.com/RQ2Tt08xKdCZXLszHTufk2kroGMBFVgGunnp33U1Xh4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAxLzYzLzEzLzMx/LzM2MF9GXzE2MzEz/MzEwN19uQWxNZ2pQ/VXljaVRFblpDczRH/Rjk3d1NUWVhEQUhB/bi5qcGc"
-                            alt=""
-                          />
-                          {order.country}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">
-                          {order.date}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          ${order.totalRevenue.toFixed(2)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <button className="text-indigo-600 hover:text-indigo-900">
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
+                  {users?.length > 0 ? (
+                    users?.map((order: (typeof users)[0]) => (
+                      <tr key={order.id}>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {order.id}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {order.name}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {order.email}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500 inline-flex gap-2">
+                            <img
+                              width={20}
+                              height={20}
+                              src="https://imgs.search.brave.com/RQ2Tt08xKdCZXLszHTufk2kroGMBFVgGunnp33U1Xh4/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90NC5m/dGNkbi5uZXQvanBn/LzAxLzYzLzEzLzMx/LzM2MF9GXzE2MzEz/MzEwN19uQWxNZ2pQ/VXljaVRFblpDczRH/Rjk3d1NUWVhEQUhB/bi5qcGc"
+                              alt=""
+                            />
+                            {order?.country || "IND"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {order.lastPurchased}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            ${order.totalAmountRevenue?.toFixed(2)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <button className="text-indigo-600 hover:text-indigo-900">
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>No Customers Exists</tr>
+                  )}
                 </tbody>
               </table>
             </div>

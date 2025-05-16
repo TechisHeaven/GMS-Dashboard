@@ -30,7 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const queryClient = useQueryClient();
-  const token = Cookies.get("token");
+  const token = Cookies.get("store-token");
   // React Query: Verify User
   const {
     refetch: verifyUser,
@@ -59,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       AuthService.login(email, password),
     onSuccess: (data) => {
       toast.success("Login Successfully");
-      Cookies.set("token", data.token, { sameSite: "strict" });
+      Cookies.set("store-token", data.token, { sameSite: "strict" });
       verifyUser();
       queryClient.invalidateQueries({ queryKey: ["user"] });
     },
@@ -80,7 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }) => AuthService.register(fullName, email, password),
     onSuccess: (data) => {
       toast.success("Register Successfully");
-      Cookies.set("token", data.token, { sameSite: "strict" });
+      Cookies.set("store-token", data.token, { sameSite: "strict" });
       queryClient.invalidateQueries({ queryKey: ["user"] });
       verifyUser();
     },
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const logout = async () => {
-    Cookies.remove("token");
+    Cookies.remove("store-token");
     queryClient.invalidateQueries({ queryKey: ["user"] });
     queryClient.removeQueries({ queryKey: ["user"] });
     verifyUser();
@@ -113,9 +113,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     <AuthContext.Provider
       value={{
         user,
-        token: token || Cookies.get("token")!,
+        token: token || Cookies.get("store-token")!,
         isUserStoreOwner: user?.role === "store-owner" || false,
-        isAuthenticated: !!user && !!Cookies.get("token"),
+        isAuthenticated: !!user && !!Cookies.get("store-token"),
         isLoading:
           isLoading || loginMutation.isPending || registerMutation.isPending,
         login,

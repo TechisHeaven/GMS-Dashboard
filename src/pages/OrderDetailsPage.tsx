@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, MoreVertical } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { OrderService } from "../service/order.service";
 import {
   getStatusColor,
@@ -11,6 +11,15 @@ import {
 const OrderDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const updateStatusMutation = useMutation({
+    mutationFn: (newStatus: string) =>
+      OrderService.updateOrderStatus(id!, newStatus),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["orderDetails", id] });
+    },
+  });
 
   const {
     data: orderDetails,
@@ -30,8 +39,6 @@ const OrderDetailsPage = () => {
     return <div>Error loading order details.</div>;
   }
 
-  console.log(orderDetails.items[0]);
-  // const orderItem = orderDetails.items[0];
   // Mock data
   // const orderDetails = {
   //   id: "SPRITE-100063",
@@ -210,6 +217,32 @@ const OrderDetailsPage = () => {
                   <h4 className="text-sm font-medium text-gray-500 mb-4">
                     Order Timeline
                   </h4>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Update Order Status
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <select
+                        className="rounded-md border-gray-300 px-3 py-2"
+                        value={orderDetails.status}
+                        onChange={(e) =>
+                          updateStatusMutation.mutate(e.target.value)
+                        }
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        {orderStages.map((stage) => (
+                          <option key={stage} value={stage}>
+                            {getStatusLabel(stage)}
+                          </option>
+                        ))}
+                      </select>
+                      {updateStatusMutation.isPending && (
+                        <span className="text-xs text-gray-500">
+                          Updating...
+                        </span>
+                      )}
+                    </div>
+                  </div>
                   <div className="space-y-4">
                     {orderStages.map((stage, index) => {
                       const isCompleted = index < currentStageIndex;
